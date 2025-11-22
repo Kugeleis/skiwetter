@@ -1,0 +1,72 @@
+[project]
+name = "skiwetter"
+version = "0.1.0"
+description = "Ski weather dashboard for Altenberg"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "pdfplumber",
+    "schedule",
+    "fastapi",
+    "uvicorn",
+    "jinja2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "playwright",
+    "ruff",
+    "bandit",
+    "mypy",
+    "types-requests",
+    "types-beautifulsoup4",
+]
+
+[tool.bumpversion]
+current_version = "0.1.0"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = "{current_version}"
+replace = "{new_version}"
+regex = false
+ignore_missing_version = false
+ignore_missing_files = false
+tag = true
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = false
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+commit_args = ""
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "PL", "RUF"]
+ignore = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["."]
+
+[dependency-groups]
+dev = [
+    "bump-my-version>=1.2.4",
+    "duty>=1.6.3",
+    "httpx>=0.28.1",
+    "playwright>=1.56.0",
+    "pytest>=9.0.1",
+    "ruff>=0.14.6",
+    "types-beautifulsoup4>=4.12.0.20250516",
+    "types-requests>=2.32.4.20250913",
+]

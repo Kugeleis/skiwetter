@@ -1,44 +1,72 @@
-from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
 import json
-import os
 import logging
+import os
+from typing import Any
+
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+app = FastAPI(title="Ski Weather Dashboard")
 
 # Setup templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
 DATA_FILE = "/data/weather.json"
 
-@app.get("/")
-async def read_root(request: Request):
-    data = {}
-    if os.path.exists(DATA_FILE):
+
+def load_weather_data(file_path: str) -> dict[str, Any]:
+    """Loads weather data from the JSON file.
+
+    Args:
+        file_path: Path to the JSON file.
+
+    Returns:
+        A dictionary containing weather data or an error message.
+    """
+    if os.path.exists(file_path):
         try:
-            with open(DATA_FILE, 'r') as f:
-                data = json.load(f)
+            with open(file_path) as f:
+                return json.load(f)
         except Exception as e:
             logger.error(f"Error reading data file: {e}")
-            data = {"error": "Could not load weather data."}
+            return {"error": "Could not load weather data."}
     else:
-        data = {"error": "Weather data not available yet. Please wait for the scraper to run."}
-    
-    return templates.TemplateResponse("index.html", {"request": request, "weather": data})
+        return {"error": "Weather data not available yet. Please wait for the scraper to run."}
 
-@app.get("/api/data")
-async def get_data():
-    if os.path.exists(DATA_FILE):
-        try:
-            with open(DATA_FILE, 'r') as f:
-                data = json.load(f)
-            return JSONResponse(content=data)
-        except Exception as e:
-            return JSONResponse(content={"error": str(e)}, status_code=500)
-    return JSONResponse(content={"error": "Data not found"}, status_code=404)
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request) -> HTMLResponse:
+    """Renders the main dashboard page.
+
+    Args:
+        request: The incoming request.
+
+    Returns:
+        The rendered HTML page.
+    """
+    data = load_weather_data(DATA_FILE)
+    return templates.TemplateResponse(request=request, name="index.html", context={"weather": data})
+
+
+@app.get("/api/data", response_class=JSONResponse)
+async def get_data() -> JSONResponse:
+    """Returns the raw weather data as JSON.
+
+    Returns:
+        A JSON response containing the weather data or an error.
+    """
+    data = load_weather_data(DATA_FILE)
+    if "error" in data and "scraper" not in data.get("error", ""):
+        # If it's a file not found error (scraper hasn't run), return 404?
+        # Actually the load_weather_data returns a dict with error key.
+        # Let's check if file exists logic again.
+        if not os.path.exists(DATA_FILE):
+            return JSONResponse(content=data, status_code=404)
+        return JSONResponse(content=data, status_code=500)
+
+    return JSONResponse(content=data)

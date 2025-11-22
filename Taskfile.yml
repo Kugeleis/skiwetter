@@ -1,0 +1,32 @@
+version: '3'
+
+tasks:
+  check:
+    desc: Run all checks (linting, formatting check, tests)
+    cmds:
+      - uv run duty check
+
+  format:
+    desc: Format code and fix linting issues
+    cmds:
+      - uv run duty format
+
+  clean:
+    desc: Clean up build artifacts
+    cmds:
+      - uv run duty clean
+
+  bump-patch:
+    desc: Bump patch version (0.0.X)
+    cmds:
+      - uv run duty release part=patch
+
+  bump-minor:
+    desc: Bump minor version (0.X.0)
+    cmds:
+      - uv run duty release part=minor
+
+  bump-major:
+    desc: Bump major version (X.0.0)
+    cmds:
+      - uv run duty release part=major
