@@ -13,7 +13,7 @@ services:
       context: .
       dockerfile: Dockerfile.web
     ports:
-      - "8000:8000"
+      - "8899:8000"
     volumes:
       - weather_data:/data
     depends_on:

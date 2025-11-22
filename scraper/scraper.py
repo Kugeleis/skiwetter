@@ -3,12 +3,17 @@ import json
 import logging
 import os
 import time
+from pathlib import Path
 
 import pdfplumber
 import requests
 import schedule
 import yaml
 from bs4 import BeautifulSoup
+
+from .helpers import get_project_root
+
+root = get_project_root()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -23,7 +28,7 @@ class SkiWeatherScraper:
         "https://www.altenberg.de/de/p/-de-p-tages-news-zum-download-47003971-/tages-news-zum-download/47003971/"
     )
 
-    def __init__(self, data_file: str = "/data/weather.json"):
+    def __init__(self, data_file: Path | str = root / "weather_data" / "weather.json"):
         """Initialize the scraper.
 
         Args:
@@ -215,7 +220,7 @@ class SkiWeatherScraper:
                     self.save_data(data)
 
 
-def load_schedule_config(config_file: str = "/data/schedule.yaml") -> dict:
+def load_schedule_config(config_file: Path | str = root / "weather_data" / "schedule.yaml") -> dict:
     """Load schedule configuration from YAML file.
 
     Args:
