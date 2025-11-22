@@ -11,7 +11,7 @@ import schedule
 import yaml
 from bs4 import BeautifulSoup
 
-from .helpers import get_project_root
+from scraper.helpers import get_project_root
 
 root = get_project_root()
 
@@ -28,7 +28,7 @@ class SkiWeatherScraper:
         "https://www.altenberg.de/de/p/-de-p-tages-news-zum-download-47003971-/tages-news-zum-download/47003971/"
     )
 
-    def __init__(self, data_file: Path | str = root / "weather_data" / "weather.json"):
+    def __init__(self, data_file: Path | str = root / "shared_data" / "weather.json"):
         """Initialize the scraper.
 
         Args:
