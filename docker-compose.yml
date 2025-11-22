@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile.scraper
     volumes:
       - weather_data:/data
+      - ./schedule.yaml:/data/schedule.yaml:ro
     restart: unless-stopped
 
   web:

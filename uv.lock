@@ -954,13 +954,14 @@ wheels = [
 
 [[package]]
 name = "skiwetter"
-version = "0.2.0"
+version = "0.2.1"
 source = { virtual = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "fastapi" },
     { name = "jinja2" },
     { name = "pdfplumber" },
+    { name = "pyyaml" },
     { name = "requests" },
     { name = "schedule" },
     { name = "uvicorn" },
@@ -999,6 +1000,7 @@ requires-dist = [
     { name = "pdfplumber" },
     { name = "playwright", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'" },
+    { name = "pyyaml" },
     { name = "requests" },
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "schedule" },
