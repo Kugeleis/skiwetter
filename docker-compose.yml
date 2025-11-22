@@ -1,0 +1,23 @@
+services:
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile.scraper
+    volumes:
+      - weather_data:/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "8000:8000"
+    volumes:
+      - weather_data:/data
+    depends_on:
+      - scraper
+    restart: unless-stopped
+
+volumes:
+  weather_data:

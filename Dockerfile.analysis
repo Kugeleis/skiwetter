@@ -1,0 +1,6 @@
+FROM python:3.9-slim
+RUN pip install pdfplumber
+WORKDIR /app
+COPY analyze_pdf.py .
+COPY tages_news.pdf .
+CMD ["python", "analyze_pdf.py"]
