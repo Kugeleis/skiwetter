@@ -7,6 +7,14 @@ services:
       - ./weather_data:/data
       - ./weather_data/schedule.yaml:/data/schedule.yaml:ro
     restart: unless-stopped
+    develop:
+      watch:
+        - action: rebuild
+          path: ./scraper
+        - action: rebuild
+          path: ./pyproject.toml
+        - action: rebuild
+          path: ./Dockerfile.scraper
 
   web:
     build:
@@ -19,6 +27,14 @@ services:
     depends_on:
       - scraper
     restart: unless-stopped
+    develop:
+      watch:
+        - action: rebuild
+          path: ./web
+        - action: rebuild
+          path: ./pyproject.toml
+        - action: rebuild
+          path: ./Dockerfile.web
 
 volumes:
   weather_data:
