@@ -144,7 +144,7 @@ class SkiWeatherScraper:
             logger.error(f"Error downloading PDF: {e}")
             return None
 
-    def _extract_from_cell(self, cell: str, idx: int, row: list[str], data: dict[str, str]) -> None:  # noqa: PLR0912
+    def _extract_from_cell(self, cell: str, idx: int, row: list[str | None], data: dict[str, str]) -> None:  # noqa: PLR0912, PLR0915
         """Helper to extract data from a single cell."""
         if "TAGES-NEWS" in cell:
             data["date"] = cell.replace("TAGES-NEWS - ", "").strip()
@@ -152,9 +152,10 @@ class SkiWeatherScraper:
         if "Temperatur" in cell:
             # Value might be in the next cell
             if idx + 1 < len(row) and row[idx + 1]:
-                val = row[idx + 1].strip()
+                val = row[idx + 1]
+                assert val is not None  # Type narrowing for mypy
                 if "°C" in val:
-                    data["temperature"] = val
+                    data["temperature"] = val.strip()
 
             # Or in the same cell on a new line
             if data["temperature"] == "Unknown":
@@ -169,11 +170,15 @@ class SkiWeatherScraper:
             if "Uhrzeit:" in cell and "Uhr" in cell.split("Uhrzeit:")[1]:
                 data["update_time"] = cell.split("Uhrzeit:")[1].strip()
             elif idx + 1 < len(row) and row[idx + 1]:
-                data["update_time"] = row[idx + 1].strip()
+                val = row[idx + 1]
+                assert val is not None  # Type narrowing for mypy
+                data["update_time"] = val.strip()
 
         if "Wetterlage:" in cell:
             if idx + 1 < len(row) and row[idx + 1]:
-                data["weather_condition"] = row[idx + 1].strip()
+                val = row[idx + 1]
+                assert val is not None  # Type narrowing for mypy
+                data["weather_condition"] = val.strip()
             else:
                 parts = cell.split("Wetterlage:")
                 if len(parts) > 1:
@@ -181,7 +186,9 @@ class SkiWeatherScraper:
 
         if "durchschnittliche Schneehöhe" in cell:
             if idx + 1 < len(row) and row[idx + 1]:
-                data["snow_depth"] = row[idx + 1].strip()
+                val = row[idx + 1]
+                assert val is not None  # Type narrowing for mypy
+                data["snow_depth"] = val.strip()
             else:
                 lines = cell.split("\n")
                 for i, line in enumerate(lines):
@@ -190,7 +197,9 @@ class SkiWeatherScraper:
 
         if "Schneeart:" in cell:
             if idx + 1 < len(row) and row[idx + 1]:
-                data["snow_type"] = row[idx + 1].strip()
+                val = row[idx + 1]
+                assert val is not None  # Type narrowing for mypy
+                data["snow_type"] = val.strip()
             else:
                 parts = cell.split("Schneeart:")
                 if len(parts) > 1:
@@ -198,7 +207,9 @@ class SkiWeatherScraper:
 
         if "letzter Schneefall:" in cell:
             if idx + 1 < len(row) and row[idx + 1]:
-                data["last_snowfall"] = row[idx + 1].strip()
+                val = row[idx + 1]
+                assert val is not None  # Type narrowing for mypy
+                data["last_snowfall"] = val.strip()
             else:
                 parts = cell.split("letzter Schneefall:")
                 if len(parts) > 1:

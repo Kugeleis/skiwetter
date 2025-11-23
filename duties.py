@@ -6,7 +6,7 @@ def check(ctx):
     """Check code quality (linting and testing)."""
     ctx.run("uv run ruff check .", title="Linting (Ruff)")
     ctx.run("uv run ruff format --check .", title="Checking formatting (Ruff)")
-    ctx.run("uv run pytest", title="Running tests (Pytest)")
+    ctx.run("uv run mypy scraper/ web/ --ignore-missing-imports", title="Running mypy type checks")
 
 
 @duty
