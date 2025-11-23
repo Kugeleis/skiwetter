@@ -26,6 +26,6 @@ jobs:
         run: |
           git config --global user.name 'Scraper Bot'
           git config --global user.email 'scraper@example.com'
-          git add data/weather.json docs/weather.json
+          git add -f data/weather.json docs/weather.json
           git commit -m 'Update weather data' || echo 'No changes to commit'
           git push
