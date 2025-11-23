@@ -1,6 +1,6 @@
 [project]
 name = "skiwetter"
-version = "0.2.4"
+version = "0.2.5"
 description = "Ski weather dashboard for Altenberg"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -27,7 +27,7 @@ dev = [
 ]
 
 [tool.bumpversion]
-current_version = "0.2.4"
+current_version = "0.2.5"
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
