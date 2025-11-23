@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
-from .helpers import get_data_file_path
+from common.helpers import get_data_file_path
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

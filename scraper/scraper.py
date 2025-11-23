@@ -13,14 +13,11 @@ import schedule
 import yaml
 from bs4 import BeautifulSoup
 
-from .helpers import get_project_root
+from common.helpers import get_data_file_path
 
-# Get the data directory from the environment variable or default to the project root.
-# This makes the scraper compatible with both local and Docker environments.
-if data_dir_str := os.environ.get("DATA_DIR"):
-    data_dir = Path(data_dir_str)
-else:
-    data_dir = get_project_root() / "data"
+# Get the data directory using the common helper function.
+# This ensures consistency between local and Docker environments.
+data_dir = get_data_file_path().parent
 
 
 def setup_logging(log_file: Path | str = data_dir / "scraper.log") -> logging.Logger:
