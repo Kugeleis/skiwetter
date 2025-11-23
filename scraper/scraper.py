@@ -7,22 +7,23 @@ import time
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-# Add project root to sys.path to allow running from command line
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-
 import pdfplumber
 import requests
 import schedule
 import yaml
 from bs4 import BeautifulSoup
 
-from helpers import get_project_root
+from .helpers import get_project_root
 
-root = get_project_root()
+# Get the data directory from the environment variable or default to the project root.
+# This makes the scraper compatible with both local and Docker environments.
+if data_dir_str := os.environ.get("DATA_DIR"):
+    data_dir = Path(data_dir_str)
+else:
+    data_dir = get_project_root() / "data"
 
 
-def setup_logging(log_file: Path | str = root / "data" / "scraper.log") -> logging.Logger:
+def setup_logging(log_file: Path | str = data_dir / "scraper.log") -> logging.Logger:
     """Configure logging with both file and console handlers.
 
     Sets up a rotating file handler that limits log file size to 1MB
@@ -80,7 +81,7 @@ class SkiWeatherScraper:
         "https://www.altenberg.de/de/p/-de-p-tages-news-zum-download-47003971-/tages-news-zum-download/47003971/"
     )
 
-    def __init__(self, data_file: Path | str = root / "data" / "weather.json"):
+    def __init__(self, data_file: Path | str = data_dir / "weather.json"):
         """Initialize the scraper.
 
         Args:
@@ -283,7 +284,7 @@ class SkiWeatherScraper:
                     self.save_data(data)
 
 
-def load_schedule_config(config_file: Path | str = root / "data" / "schedule.yaml") -> dict:
+def load_schedule_config(config_file: Path | str = data_dir / "schedule.yaml") -> dict:
     """Load schedule configuration from YAML file.
 
     Args:
