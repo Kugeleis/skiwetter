@@ -12,6 +12,6 @@ COPY pyproject.toml .
 # We use --system to install into the system python environment since we are in a container
 RUN uv pip install --system .
 
-COPY scraper/scraper.py .
+COPY scraper/ .
 
 CMD ["python", "scraper.py"]

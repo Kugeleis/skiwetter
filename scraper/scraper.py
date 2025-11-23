@@ -17,7 +17,7 @@ import schedule
 import yaml
 from bs4 import BeautifulSoup
 
-from scraper.helpers import get_project_root
+from helpers import get_project_root
 
 root = get_project_root()
 
