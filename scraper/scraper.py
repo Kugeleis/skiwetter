@@ -2,8 +2,13 @@ import io
 import json
 import logging
 import os
+import sys
 import time
 from pathlib import Path
+
+# Add project root to sys.path to allow running from command line
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 
 import pdfplumber
 import requests

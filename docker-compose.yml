@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile.scraper
     volumes:
-      - weather_data:/data
-      - ./schedule.yaml:/data/schedule.yaml:ro
+      - ./weather_data:/data
+      - ./weather_data/schedule.yaml:/data/schedule.yaml:ro
     restart: unless-stopped
 
   web:
@@ -15,7 +15,7 @@ services:
     ports:
       - "8899:8000"
     volumes:
-      - weather_data:/data
+      - ./shared_data:/data
     depends_on:
       - scraper
     restart: unless-stopped
