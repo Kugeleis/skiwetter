@@ -109,6 +109,34 @@
             color: #64748b;
         }
 
+        .webcam-container {
+            margin-top: 2rem;
+        }
+
+        .webcam-iframe {
+            width: 100%;
+            height: 450px;
+            border: 0;
+            border-radius: 16px;
+        }
+
+        .webcam-links {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+        }
+
+        .webcam-links a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .webcam-links a:hover {
+            color: #fff;
+        }
+
         .error-message {
             color: #f87171;
             text-align: center;
@@ -259,6 +287,17 @@
                 </div>
             </div>
             <div id="error-message" class="error-message" style="display: none;"></div>
+        </div>
+
+        <div class="glass-card webcam-container">
+            <iframe class="webcam-iframe"
+                src="https://g0.ipcamlive.com/player/player.php?alias=62275e7c7f474&autoplay=1&mute=1"
+                allowfullscreen></iframe>
+            <div class="webcam-links">
+                <a href="https://zinnwald.de/webcam-2/" target="_blank" rel="noopener noreferrer">Webcam Zinnwald</a>
+                <a href="https://www.altenberg.de/de/p/-de-p-webcams-47951116-/webcams/47951116/" target="_blank"
+                    rel="noopener noreferrer">Webcams Altenberg</a>
+            </div>
         </div>
     </div>
 
