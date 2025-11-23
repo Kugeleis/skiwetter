@@ -31,3 +31,9 @@ def release(ctx, part="patch"):
         part: The part of the version to bump (major, minor, patch).
     """
     ctx.run(f"uv run bump-my-version bump {part}", title=f"Bumping {part} version")
+
+
+@duty
+def dev(ctx):
+    """Run the web server locally."""
+    ctx.run("uv run uvicorn web.main:app --reload", title="Starting development server", capture=False)

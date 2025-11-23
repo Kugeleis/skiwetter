@@ -30,3 +30,8 @@ tasks:
     desc: Bump major version (X.0.0)
     cmds:
       - uv run duty release part=major
+
+  dev:
+    desc: Run the web server locally
+    cmds:
+      - uv run duty dev
