@@ -2,7 +2,8 @@ name: Scrape and Deploy
 
 on:
   schedule:
-    - cron: '0 */4 * * *'
+    # Run every 10 minutes between 7 and 11 AM CET (6-10 UTC)
+    - cron: '*/10 6-10 * * *'
   workflow_dispatch:
   push:
     branches: ["main"]
