@@ -1,6 +1,17 @@
-FROM python:3.9-slim
-RUN pip install pdfplumber
+FROM python:3.13-slim
+
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
 WORKDIR /app
+
+# Copy pyproject.toml to install dependencies
+COPY pyproject.toml .
+
+# Install dependencies from pyproject.toml
+# We use --system to install into the system python environment since we are in a container
+RUN uv pip install --system .
+
 COPY analyze_pdf.py .
 COPY tages_news.pdf .
 CMD ["python", "analyze_pdf.py"]

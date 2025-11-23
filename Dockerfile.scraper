@@ -5,9 +5,12 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 WORKDIR /app
 
-# Install dependencies
+# Copy pyproject.toml to install dependencies
+COPY pyproject.toml .
+
+# Install dependencies from pyproject.toml
 # We use --system to install into the system python environment since we are in a container
-RUN uv pip install --system requests beautifulsoup4 pdfplumber schedule
+RUN uv pip install --system .
 
 COPY scraper/scraper.py .
 
