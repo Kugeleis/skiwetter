@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile.scraper
     volumes:
       - ./data:/data
+    environment:
+      - DATA_DIR=/data
     restart: unless-stopped
     develop:
       watch:
