@@ -12,6 +12,6 @@ COPY pyproject.toml .
 # We use --system to install into the system python environment since we are in a container
 RUN uv pip install --system .
 
-COPY analyze_pdf.py .
-COPY tages_news.pdf .
+COPY scripts/analyze_pdf.py .
+COPY data/tages_news.pdf .
 CMD ["python", "analyze_pdf.py"]

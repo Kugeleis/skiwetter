@@ -6,6 +6,4 @@ def get_project_root(sentinel=".git") -> Path:
     try:
         return next(p for p in Path(__file__).parents if (p / sentinel).exists())
     except StopIteration as exc:
-        raise FileNotFoundError(
-            f"Project root not found. No '{sentinel}' in parent directories of {__file__}"
-        ) from exc
+        raise FileNotFoundError(f"Project root not found. No '{sentinel}' in parent directories of {__file__}") from exc

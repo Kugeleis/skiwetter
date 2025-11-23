@@ -130,7 +130,9 @@ cython_debug/
 docker-compose.override.yml
 
 # Project Specific
-data/
+# Data directory - ignore all except schedule.yaml (configuration)
+data/*
+!data/schedule.yaml
 weather.json
 .DS_Store
 

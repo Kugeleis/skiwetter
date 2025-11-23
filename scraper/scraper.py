@@ -33,7 +33,7 @@ class SkiWeatherScraper:
         "https://www.altenberg.de/de/p/-de-p-tages-news-zum-download-47003971-/tages-news-zum-download/47003971/"
     )
 
-    def __init__(self, data_file: Path | str = root / "shared_data" / "weather.json"):
+    def __init__(self, data_file: Path | str = root / "data" / "weather.json"):
         """Initialize the scraper.
 
         Args:
@@ -225,7 +225,7 @@ class SkiWeatherScraper:
                     self.save_data(data)
 
 
-def load_schedule_config(config_file: Path | str = root / "weather_data" / "schedule.yaml") -> dict:
+def load_schedule_config(config_file: Path | str = root / "data" / "schedule.yaml") -> dict:
     """Load schedule configuration from YAML file.
 
     Args:

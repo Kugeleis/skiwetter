@@ -4,8 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.scraper
     volumes:
-      - ./weather_data:/data
-      - ./weather_data/schedule.yaml:/data/schedule.yaml:ro
+      - ./data:/data
     restart: unless-stopped
     develop:
       watch:
@@ -23,7 +22,7 @@ services:
     ports:
       - "8899:8000"
     volumes:
-      - ./shared_data:/data
+      - ./data:/data
     depends_on:
       - scraper
     restart: unless-stopped
@@ -35,6 +34,3 @@ services:
           path: ./pyproject.toml
         - action: rebuild
           path: ./Dockerfile.web
-
-volumes:
-  weather_data:

@@ -101,11 +101,11 @@ docker compose up -d --build
 
 ## ⏰ Scheduling the Scraper
 
-The scraper schedule is configured via `schedule.yaml` in the project root. This file is mounted into the Docker container and read at startup.
+The scraper schedule is configured via `data/schedule.yaml`. This file is mounted into the Docker container and read at startup.
 
 ### Default Schedule
 
-By default, the scraper runs **every 4 hours**. This is defined in `schedule.yaml`:
+By default, the scraper runs **every 4 hours**. This is defined in `data/schedule.yaml`:
 
 ```yaml
 default:
@@ -115,11 +115,11 @@ default:
 
 ### Customizing the Schedule
 
-Edit `schedule.yaml` to change when the scraper runs. The first non-commented schedule in the file will be used.
+Edit `data/schedule.yaml` to change when the scraper runs. The first non-commented schedule in the file will be used.
 
 #### Example: Run Every Morning (7-11 AM, Every 10 Minutes)
 
-Uncomment the `morning_intensive` section in `schedule.yaml`:
+Uncomment the `morning_intensive` section in `data/schedule.yaml`:
 
 ```yaml
 morning_intensive:
@@ -155,7 +155,7 @@ specific_times:
 
 ### Applying Schedule Changes
 
-After modifying `schedule.yaml`, restart the scraper container:
+After modifying `data/schedule.yaml`, restart the scraper container:
 
 ```bash
 docker compose restart scraper
@@ -215,7 +215,12 @@ skiwetter/
 │   ├── test_scraper.py
 │   ├── test_web.py
 │   └── visual_test.py
-├── schedule.yaml      # Scraper schedule configuration
+├── scripts/           # Utility scripts
+│   └── analyze_pdf.py # PDF analysis tool
+├── data/              # Runtime data (shared by all containers)
+│   ├── schedule.yaml  # Scraper schedule (version controlled)
+│   ├── weather.json   # Current weather data (generated)
+│   └── tages_news.pdf # Latest downloaded PDF (generated)
 ├── Dockerfile.scraper # Scraper container
 ├── Dockerfile.web     # Web container
 ├── docker-compose.yml # Service orchestration
