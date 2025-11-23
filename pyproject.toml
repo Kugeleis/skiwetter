@@ -8,11 +8,9 @@ dependencies = [
     "requests",
     "beautifulsoup4",
     "pdfplumber",
-    "schedule",
     "fastapi",
     "uvicorn",
     "jinja2",
-    "pyyaml",
 ]
 
 [project.optional-dependencies]

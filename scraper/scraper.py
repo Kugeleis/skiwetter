@@ -6,11 +6,10 @@ import sys
 import time
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+import shutil
 
 import pdfplumber
 import requests
-import schedule
-import yaml
 from bs4 import BeautifulSoup
 
 from common.helpers import get_data_file_path
@@ -279,103 +278,13 @@ class SkiWeatherScraper:
                 data = self.extract_weather_data(pdf_file)
                 if data:
                     self.save_data(data)
-
-
-def load_schedule_config(config_file: Path | str = data_dir / "schedule.yaml") -> dict:
-    """Load schedule configuration from YAML file.
-
-    Args:
-        config_file: Path to the schedule configuration file.
-
-    Returns:
-        Schedule configuration dictionary.
-    """
-    # Default configuration
-    default_config = {"default": {"interval": 4, "unit": "hours"}}
-
-    if not os.path.exists(config_file):
-        logger.warning(f"Schedule config not found at {config_file}, using default (every 4 hours)")
-        return default_config
-
-    try:
-        with open(config_file) as f:
-            config = yaml.safe_load(f)
-            if not config:
-                logger.warning("Empty schedule config, using default")
-                return default_config
-            logger.info(f"Loaded schedule config from {config_file}")
-            return config
-    except Exception as e:
-        logger.error(f"Error loading schedule config: {e}, using default")
-        return default_config
-
-
-def setup_schedule(scraper: SkiWeatherScraper, config: dict) -> None:
-    """Set up the scraper schedule based on configuration.
-
-    Args:
-        scraper: The scraper instance.
-        config: Schedule configuration dictionary.
-    """
-    # Find the active schedule (first non-commented key)
-    active_schedule = None
-    for key, value in config.items():
-        if value:  # Skip None/empty values
-            active_schedule = (key, value)
-            break
-
-    if not active_schedule:
-        logger.warning("No active schedule found, using default")
-        schedule.every(4).hours.do(scraper.run)
-        return
-
-    schedule_name, schedule_config = active_schedule
-    logger.info(f"Setting up schedule: {schedule_name}")
-
-    # Handle interval-based schedules
-    if "interval" in schedule_config and "unit" in schedule_config:
-        interval = schedule_config["interval"]
-        unit = schedule_config["unit"]
-
-        if unit == "hours":
-            schedule.every(interval).hours.do(scraper.run)
-            logger.info(f"Scheduled to run every {interval} hour(s)")
-        elif unit == "minutes":
-            schedule.every(interval).minutes.do(scraper.run)
-            logger.info(f"Scheduled to run every {interval} minute(s)")
-        elif unit == "days":
-            schedule.every(interval).days.do(scraper.run)
-            logger.info(f"Scheduled to run every {interval} day(s)")
-        else:
-            logger.warning(f"Unknown unit: {unit}, using default")
-            schedule.every(4).hours.do(scraper.run)
-
-    # Handle time-based schedules
-    elif "times" in schedule_config:
-        times = schedule_config["times"]
-        for time_str in times:
-            schedule.every().day.at(time_str).do(scraper.run)
-        logger.info(f"Scheduled to run at {len(times)} specific times per day")
-
-    else:
-        logger.warning("Invalid schedule config, using default")
-        schedule.every(4).hours.do(scraper.run)
-
-
-def main() -> None:
-    scraper = SkiWeatherScraper()
-
-    # Run once immediately
-    scraper.run()
-
-    # Load and set up schedule
-    config = load_schedule_config()
-    setup_schedule(scraper, config)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(60)
+                    # Also copy to docs
+                    docs_path = Path("docs/weather.json")
+                    if not docs_path.parent.exists():
+                        docs_path.parent.mkdir(parents=True)
+                    shutil.copy(self.data_file, docs_path)
 
 
 if __name__ == "__main__":
-    main()
+    scraper = SkiWeatherScraper()
+    scraper.run()

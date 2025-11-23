@@ -1,0 +1,26 @@
+name: Scrape Weather Data
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run scraper
+        run: docker-compose run --rm scraper
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'Scraper Bot'
+          git config --global user.email 'scraper@example.com'
+          git add data/weather.json docs/weather.json
+          git commit -m 'Update weather data' || echo 'No changes to commit'
+          git push
