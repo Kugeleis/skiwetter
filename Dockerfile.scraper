@@ -13,5 +13,6 @@ COPY pyproject.toml .
 RUN uv pip install --system .
 
 COPY scraper/ scraper/
+COPY common/ common/
 
 CMD ["python", "-m", "scraper.scraper"]
