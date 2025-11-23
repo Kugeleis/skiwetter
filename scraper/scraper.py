@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import time
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 # Add project root to sys.path to allow running from command line
@@ -20,9 +21,55 @@ from scraper.helpers import get_project_root
 
 root = get_project_root()
 
+
+def setup_logging(log_file: Path | str = root / "data" / "scraper.log") -> logging.Logger:
+    """Configure logging with both file and console handlers.
+
+    Sets up a rotating file handler that limits log file size to 1MB
+    and keeps 1 backup file. Also configures console output for Docker compatibility.
+
+    Args:
+        log_file: Path to the log file.
+
+    Returns:
+        Configured logger instance.
+    """
+    # Create logger
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+
+    # Prevent duplicate handlers if function is called multiple times
+    if logger.handlers:
+        return logger
+
+    # Create formatters
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+
+    # File handler with rotation (1MB max size, 1 backup file)
+    log_path = Path(log_file)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    file_handler = RotatingFileHandler(
+        log_path,
+        maxBytes=1024 * 1024,  # 1MB
+        backupCount=1,
+    )
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+
+    # Console handler for Docker/stdout
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(formatter)
+
+    # Add handlers to logger
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    return logger
+
+
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
+logger = setup_logging()
 
 
 class SkiWeatherScraper:

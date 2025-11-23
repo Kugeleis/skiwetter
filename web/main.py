@@ -1,11 +1,14 @@
 import json
 import logging
 import os
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+
+from .helpers import get_data_file_path
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -16,10 +19,11 @@ app = FastAPI(title="Ski Weather Dashboard")
 # Setup templates
 templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
-DATA_FILE = "/data/weather.json"
+# Get data file path (works both locally and in Docker)
+DATA_FILE = get_data_file_path("weather.json")
 
 
-def load_weather_data(file_path: str) -> dict[str, Any]:
+def load_weather_data(file_path: Path | str) -> dict[str, Any]:
     """Loads weather data from the JSON file.
 
     Args:
@@ -28,7 +32,8 @@ def load_weather_data(file_path: str) -> dict[str, Any]:
     Returns:
         A dictionary containing weather data or an error message.
     """
-    if os.path.exists(file_path):
+    file_path = Path(file_path)
+    if file_path.exists():
         try:
             with open(file_path) as f:
                 return json.load(f)
@@ -65,7 +70,7 @@ async def get_data() -> JSONResponse:
         # If it's a file not found error (scraper hasn't run), return 404?
         # Actually the load_weather_data returns a dict with error key.
         # Let's check if file exists logic again.
-        if not os.path.exists(DATA_FILE):
+        if not DATA_FILE.exists():
             return JSONResponse(content=data, status_code=404)
         return JSONResponse(content=data, status_code=500)
 
