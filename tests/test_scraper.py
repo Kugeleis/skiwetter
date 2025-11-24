@@ -101,7 +101,7 @@ def test_fetch_pdf_url_handles_dynamic_link_text(scraper: SkiWeatherScraper):
                 </div>
             </body>
         </html>
-        '''.encode('utf-8')
+        '''.encode()
         mock_get.return_value = mock_response
         url = scraper.fetch_pdf_url()
         assert url == "https://www.altenberg.de/r/622108495?page=media%2Fdownload"
@@ -121,7 +121,7 @@ def test_fetch_pdf_url_no_date_in_link(scraper: SkiWeatherScraper):
                 </div>
             </body>
         </html>
-        '''.encode('utf-8')
+        '''.encode()
         mock_get.return_value = mock_response
         url = scraper.fetch_pdf_url()
         assert url is None
