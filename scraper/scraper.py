@@ -2,12 +2,11 @@ import io
 import json
 import logging
 import os
+import shutil
 import sys
-import time
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-import shutil
 
 import pdfplumber
 import requests
@@ -137,12 +136,54 @@ class SkiWeatherScraper:
             return None
 
     def _format_date_iso(self, date_str: str) -> str | None:
-        """Convert date from DD.MM.YYYY to YYYY-MM-DD format."""
+        """Convert date from various German formats to YYYY-MM-DD format."""
+        original_date_str = date_str  # for logging
+
         try:
+            # First, try the simple DD.MM.YYYY format
             return datetime.strptime(date_str, "%d.%m.%Y").strftime("%Y-%m-%d")
         except ValueError:
-            logger.warning(f"Could not parse date: {date_str}")
-            return None
+            # If it fails, try the format with weekday and month name
+            try:
+                # Remove weekday: "Montag, 24. November 2025" -> "24. November 2025"
+                if "," in date_str:
+                    date_str = date_str.split(",")[1].strip()
+
+                parts = date_str.replace(".", "").split()  # -> ['24', 'November', '2025']
+                EXPECTED_DATE_PARTS = 3
+                if len(parts) != EXPECTED_DATE_PARTS:
+                    raise ValueError("Date does not have 3 parts after splitting.")
+
+                day = parts[0]
+                month_str = parts[1]
+                year = parts[2]
+
+                month_map = {
+                    "Januar": "01",
+                    "Februar": "02",
+                    "März": "03",
+                    "April": "04",
+                    "Mai": "05",
+                    "Juni": "06",
+                    "Juli": "07",
+                    "August": "08",
+                    "September": "09",
+                    "Oktober": "10",
+                    "November": "11",
+                    "Dezember": "12",
+                }
+
+                month = month_map.get(month_str)
+                if not month:
+                    raise ValueError(f"Unknown month name: {month_str}")
+
+                # Reconstruct to DD.MM.YYYY and parse again
+                formatted_date_str = f"{day}.{month}.{year}"
+                return datetime.strptime(formatted_date_str, "%d.%m.%Y").strftime("%Y-%m-%d")
+
+            except Exception:
+                logger.warning(f"Could not parse date: {original_date_str}")
+                return None
 
     def _extract_from_cell(self, cell: str, idx: int, row: list[str | None], data: dict[str, str]) -> None:  # noqa: PLR0912, PLR0915
         """Helper to extract data from a single cell."""

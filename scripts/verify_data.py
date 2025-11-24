@@ -7,7 +7,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
 
-from common.helpers import get_data_file_path
+from common.helpers import get_data_file_path  # noqa: E402
 
 
 def main() -> None:

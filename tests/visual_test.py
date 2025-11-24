@@ -1,4 +1,5 @@
 import os
+import re
 
 from playwright.sync_api import sync_playwright
 
@@ -20,13 +21,20 @@ def test_ski_weather_dashboard():
 
         page = browser.new_page()
 
+        # Capture console messages
+        page.on("console", lambda msg: print(f"Browser console: {msg.text}"))
+
         # Navigate to the app
         # Assuming the app is running on localhost:8000
         try:
-            page.goto("http://localhost:8000")
+            page.goto("http://localhost:8000", wait_until="networkidle")
 
-            # Wait for the content to load
-            page.wait_for_selector(".glass-card")
+            # Wait for the date element to be updated by the script
+            date_element = page.wait_for_selector("#date-value", timeout=5000)
+
+            # Check if the date has the correct format e.g. "Montag, 24.11.25"
+            date_text = date_element.inner_text()
+            assert re.match(r"\w+, \d{2}\.\d{2}\.\d{2}", date_text), f"Date format is incorrect: {date_text}"
 
             # Verify title
             assert "Skiwetter Altenberg" in page.title()

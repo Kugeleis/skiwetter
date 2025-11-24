@@ -262,7 +262,7 @@
             <div class="grid">
                 <div class="stat-item">
                     <div class="stat-label">Datum</div>
-                    <div class="stat-value">{{ weather.date }}</div>
+                    <div id="date-value" class="stat-value">{{ weather.date }}</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">Temperatur</div>
@@ -302,6 +302,25 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to format the date as "Wochentag, DD.MM.YY"
+            function formatDisplayDate(isoDate) {
+                const date = new Date(isoDate);
+                const options = { weekday: 'long', year: '2-digit', month: '2-digit', day: '2-digit' };
+                // German locale 'de-DE'
+                return new Intl.DateTimeFormat('de-DE', options).format(date);
+            }
+
+            const dateElement = document.getElementById('date-value');
+            if (dateElement) {
+                const isoDate = dateElement.textContent.trim();
+                if (isoDate) {
+                    dateElement.textContent = formatDisplayDate(isoDate);
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
