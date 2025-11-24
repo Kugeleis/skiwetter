@@ -101,21 +101,15 @@ class SkiWeatherScraper:
                 text = a.text.strip()
                 href = a["href"]
 
-                # Look for links that look like the download link
-                if "Tages-News" in text and ("media%2Fdownload" in href or "media/download" in href or "r/" in href):
-                    link = href
-                    if not link.startswith("http"):
-                        link = self.BASE_URL + link
-                    logger.info(f"Found PDF link: {link}")
-                    return link
-
-                # Fallback: Check if text matches the pattern "Tages-News DD.MM.YYYY"
+                # Check if the link text contains "Tages-News" and a date in the format DD.MM.YYYY
                 if "Tages-News" in text and any(char.isdigit() for char in text):
-                    link = href
-                    if not link.startswith("http"):
-                        link = self.BASE_URL + link
-                    logger.info(f"Found PDF link (fallback): {link}")
-                    return link
+                    # Further check if the href contains "media/download" or "r/"
+                    if "media%2Fdownload" in href or "media/download" in href or "r/" in href:
+                        link = href
+                        if not link.startswith("http"):
+                            link = self.BASE_URL + link
+                        logger.info(f"Found PDF link: {link}")
+                        return link
 
             logger.warning("PDF link not found.")
             return None
