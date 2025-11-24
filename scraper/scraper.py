@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import time
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 import shutil
@@ -135,10 +136,21 @@ class SkiWeatherScraper:
             logger.error(f"Error downloading PDF: {e}")
             return None
 
+    def _format_date_iso(self, date_str: str) -> str | None:
+        """Convert date from DD.MM.YYYY to YYYY-MM-DD format."""
+        try:
+            return datetime.strptime(date_str, "%d.%m.%Y").strftime("%Y-%m-%d")
+        except ValueError:
+            logger.warning(f"Could not parse date: {date_str}")
+            return None
+
     def _extract_from_cell(self, cell: str, idx: int, row: list[str | None], data: dict[str, str]) -> None:  # noqa: PLR0912, PLR0915
         """Helper to extract data from a single cell."""
         if "TAGES-NEWS" in cell:
-            data["date"] = cell.replace("TAGES-NEWS - ", "").strip()
+            raw_date = cell.replace("TAGES-NEWS - ", "").strip()
+            iso_date = self._format_date_iso(raw_date)
+            if iso_date:
+                data["date"] = iso_date
 
         if "Temperatur" in cell:
             # Value might be in the next cell

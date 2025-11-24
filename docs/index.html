@@ -317,8 +317,19 @@
             }
         }
 
+        function formatDisplayDate(isoDate) {
+            if (!isoDate) return 'N/A';
+            try {
+                const [year, month, day] = isoDate.split('-');
+                return `${day}.${month}.${year}`;
+            } catch (e) {
+                console.error('Error formatting date:', e);
+                return isoDate; // Fallback to original string
+            }
+        }
+
         function updateUI(data) {
-            document.getElementById('date').textContent = data.date;
+            document.getElementById('date').textContent = formatDisplayDate(data.date);
             document.getElementById('temperature').textContent = data.temperature;
             document.getElementById('weather_condition').textContent = data.weather_condition;
             document.getElementById('snow_depth').textContent = data.snow_depth;

@@ -32,6 +32,14 @@ jobs:
       - name: Run scraper
         run: docker compose run --rm scraper
 
+      - name: Get current hour (UTC)
+        id: date
+        run: echo "hour=$(date -u +'%H')" >> $GITHUB_OUTPUT
+
+      - name: Verify scraped data
+        if: github.event_name == 'schedule' && steps.date.outputs.hour == '10'
+        run: python scripts/verify_data.py
+
       - name: Copy weather data to docs
         run: |
           mkdir -p docs
