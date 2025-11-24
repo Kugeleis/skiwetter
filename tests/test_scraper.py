@@ -82,3 +82,46 @@ def test_save_data(scraper):
             with patch("os.makedirs"):
                 scraper.save_data(data)
                 mock_json_dump.assert_called_once()
+
+
+def test_fetch_pdf_url_handles_dynamic_link_text(scraper: SkiWeatherScraper):
+    """Test that the scraper correctly finds the PDF URL when the link text is dynamic."""
+    with patch("requests.get") as mock_get:
+        mock_response = MagicMock()
+        mock_response.content = '''
+        <html>
+            <body>
+                <div class="abo-download-area">
+                    <a href="/r/91329422?page=media/download" target="_blank" class="abo-download-link">
+                        Tages-News Statischer Link für Leistungsträger
+                    </a>
+                    <a href="/r/622108495?page=media%2Fdownload" target="_blank" class="abo-download-link">
+                        Tages-News 24.11.2025
+                    </a>
+                </div>
+            </body>
+        </html>
+        '''.encode('utf-8')
+        mock_get.return_value = mock_response
+        url = scraper.fetch_pdf_url()
+        assert url == "https://www.altenberg.de/r/622108495?page=media%2Fdownload"
+
+
+def test_fetch_pdf_url_no_date_in_link(scraper: SkiWeatherScraper):
+    """Test that the scraper does not pick up a link with no date."""
+    with patch("requests.get") as mock_get:
+        mock_response = MagicMock()
+        mock_response.content = '''
+        <html>
+            <body>
+                <div class="abo-download-area">
+                    <a href="/r/91329422?page=media/download" target="_blank" class="abo-download-link">
+                        Tages-News Statischer Link für Leistungsträger
+                    </a>
+                </div>
+            </body>
+        </html>
+        '''.encode('utf-8')
+        mock_get.return_value = mock_response
+        url = scraper.fetch_pdf_url()
+        assert url is None
