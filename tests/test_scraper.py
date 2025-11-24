@@ -66,7 +66,7 @@ def test_extract_weather_data_success(scraper):
 
         data = scraper.extract_weather_data(io.BytesIO(b"fake pdf"))
 
-        assert data["date"] == "22.11.2025"
+        assert data["date"] == "2025-11-22"
         assert data["temperature"] == "-5°C"
         assert data["weather_condition"] == "sonnig"
         assert data["snow_type"] == "Pulver"
