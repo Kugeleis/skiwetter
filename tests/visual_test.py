@@ -14,7 +14,7 @@ def test_ski_weather_dashboard():
     with sync_playwright() as p:
         if browser_path:
             print(f"Launching browser from: {browser_path}")
-            browser = p.chromium.launch(executable_path=browser_path, headless=False)
+            browser = p.chromium.launch(executable_path=browser_path, headless=True)
         else:
             print("Launching bundled Chromium")
             browser = p.chromium.launch(headless=True)
@@ -44,6 +44,13 @@ def test_ski_weather_dashboard():
             header_text = page.inner_text("h1")
             assert "Altenberg Skiwetter" in header_text
 
+            # Verify that the notes section is visible and contains the correct text
+            notes_section = page.wait_for_selector(".notes-section", timeout=5000)
+            assert notes_section.is_visible()
+            notes_text = notes_section.inner_text()
+            assert "anmerkungen" in notes_text.lower()
+            assert "Der erste Neuschnee" in notes_text
+
             # Take a screenshot
             os.makedirs("screenshots", exist_ok=True)
             page.screenshot(path="screenshots/dashboard.png", full_page=True)
@@ -56,6 +63,47 @@ def test_ski_weather_dashboard():
             browser.close()
 
 
+def test_mobile_layout():
+    # Get browser path from environment variable or default to None (Playwright's bundled Chromium)
+    browser_path = os.environ.get("BROWSER_PATH")
+
+    with sync_playwright() as p:
+        if browser_path:
+            print(f"Launching browser from: {browser_path}")
+            browser = p.chromium.launch(executable_path=browser_path, headless=False)
+        else:
+            print("Launching bundled Chromium")
+            browser = p.chromium.launch(headless=True)
+
+        page = browser.new_page()
+
+        # Set mobile viewport
+        page.set_viewport_size({"width": 375, "height": 667})
+
+        # Navigate to the app
+        try:
+            page.goto("http://localhost:8000", wait_until="networkidle")
+
+            # Wait for the date element to be updated by the script
+            page.wait_for_selector("#date-value", timeout=5000)
+
+            # Verify that the notes section is visible
+            notes_section = page.wait_for_selector(".notes-section", timeout=5000)
+            assert notes_section.is_visible()
+
+            # Take a screenshot
+            os.makedirs("screenshots", exist_ok=True)
+            page.screenshot(path="screenshots/dashboard-mobile.png", full_page=True)
+            print("Screenshot saved to screenshots/dashboard-mobile.png")
+
+        except Exception as e:
+            print(f"Mobile test failed: {e}")
+            raise e
+        finally:
+            browser.close()
+
+
 if __name__ == "__main__":
     # Simple wrapper to run without pytest if needed
     test_ski_weather_dashboard()
+    test_mobile_layout()

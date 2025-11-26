@@ -74,6 +74,30 @@
             gap: 1rem;
         }
 
+        .notes-section {
+            grid-column: 1 / -1;
+            /* Span across all columns */
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notes-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .notes-text {
+            font-size: 1rem;
+            color: #fff;
+            line-height: 1.6;
+        }
+
         .stat-item {
             background: rgba(255, 255, 255, 0.05);
             padding: 1rem;
@@ -281,6 +305,10 @@
                         <div class="stat-label">Letzter Schneefall</div>
                         <div class="stat-value" id="last_snowfall"></div>
                     </div>
+                <div class="notes-section" id="notes-section" style="display: none;">
+                    <div class="notes-label">Anmerkungen</div>
+                    <div class="notes-text" id="notes-text"></div>
+                </div>
                 </div>
                 <div class="footer">
                     Aktualisiert um: <span id="update_time"></span>
@@ -336,6 +364,13 @@
             document.getElementById('snow_type').textContent = data.snow_type;
             document.getElementById('last_snowfall').textContent = data.last_snowfall;
             document.getElementById('update_time').textContent = data.update_time;
+
+            if (data.notes) {
+                const notesSection = document.getElementById('notes-section');
+                const notesText = document.getElementById('notes-text');
+                notesText.textContent = data.notes;
+                notesSection.style.display = 'block';
+            }
         }
 
         function showError(message) {
