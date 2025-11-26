@@ -2,6 +2,7 @@ import io
 import json
 import logging
 import os
+import re
 import shutil
 import sys
 from datetime import datetime
@@ -185,7 +186,7 @@ class SkiWeatherScraper:
                 logger.warning(f"Could not parse date: {original_date_str}")
                 return None
 
-    def _extract_from_cell(self, cell: str, idx: int, row: list[str | None], data: dict[str, str]) -> None:  # noqa: PLR0912, PLR0915
+    def _extract_from_cell(self, cell: str, idx: int, row: list[str | None], data: dict[str, str | None]) -> None:  # noqa: PLR0912, PLR0915
         """Helper to extract data from a single cell."""
         if "TAGES-NEWS" in cell:
             raw_date = cell.replace("TAGES-NEWS - ", "").strip()
@@ -259,7 +260,7 @@ class SkiWeatherScraper:
                 if len(parts) > 1:
                     data["last_snowfall"] = parts[1].strip()
 
-    def extract_weather_data(self, pdf_file: io.BytesIO) -> dict[str, str] | None:
+    def extract_weather_data(self, pdf_file: io.BytesIO) -> dict[str, str | None] | None:
         """Extracts weather data from the PDF file.
 
         Args:
@@ -278,7 +279,7 @@ class SkiWeatherScraper:
                 page = pdf.pages[0]
                 tables = page.extract_tables()
 
-                data: dict[str, str] = {
+                data: dict[str, str | None] = {
                     "date": "Unknown",
                     "temperature": "Unknown",
                     "weather_condition": "Unknown",
@@ -286,6 +287,7 @@ class SkiWeatherScraper:
                     "snow_type": "Unknown",
                     "last_snowfall": "Unknown",
                     "update_time": "Unknown",
+                    "notes": None,
                 }
 
                 for table in tables:
@@ -295,13 +297,28 @@ class SkiWeatherScraper:
                                 continue
                             self._extract_from_cell(cell, idx, row, data)
 
+                # Find the bounding box of the tables to locate text below them
+                if tables:
+                    # Get the bounding box of the last table
+                    last_table_bbox = page.find_tables()[-1].bbox
+                    max_y = last_table_bbox[3]
+
+                    # Extract words that are below the tables
+                    words_below = [
+                        word["text"]
+                        for word in page.extract_words()
+                        if word["top"] > max_y
+                    ]
+                    if words_below:
+                        data["notes"] = " ".join(words_below)
+
                 logger.info(f"Extracted data: {data}")
                 return data
         except Exception as e:
             logger.error(f"Error extracting data: {e}")
             return None
 
-    def save_data(self, data: dict[str, str]) -> None:
+    def save_data(self, data: dict[str, str | None]) -> None:
         """Saves the weather data to a JSON file.
 
         Args:
