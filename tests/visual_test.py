@@ -1,3 +1,4 @@
+import json
 import os
 import re
 
@@ -44,12 +45,19 @@ def test_ski_weather_dashboard():
             header_text = page.inner_text("h1")
             assert "Altenberg Skiwetter" in header_text
 
-            # Verify that the notes section is visible and contains the correct text
-            notes_section = page.wait_for_selector(".notes-section", timeout=5000)
-            assert notes_section.is_visible()
-            notes_text = notes_section.inner_text()
-            assert "anmerkungen" in notes_text.lower()
-            assert "Der erste Neuschnee" in notes_text
+            # Check if notes exist in the data and verify the UI accordingly
+            with open("data/weather.json") as f:
+                weather_data = json.load(f)
+
+            if weather_data.get("notes"):
+                notes_section = page.wait_for_selector(".notes-section", timeout=5000)
+                assert notes_section.is_visible()
+                notes_text = notes_section.inner_text()
+                assert "anmerkungen" in notes_text.lower()
+                assert weather_data["notes"] in notes_text
+            else:
+                # Ensure the notes section is not present
+                assert not page.is_visible(".notes-section")
 
             # Take a screenshot
             os.makedirs("screenshots", exist_ok=True)
@@ -87,9 +95,16 @@ def test_mobile_layout():
             # Wait for the date element to be updated by the script
             page.wait_for_selector("#date-value", timeout=5000)
 
-            # Verify that the notes section is visible
-            notes_section = page.wait_for_selector(".notes-section", timeout=5000)
-            assert notes_section.is_visible()
+            # Check if notes exist in the data and verify the UI accordingly
+            with open("data/weather.json") as f:
+                weather_data = json.load(f)
+
+            if weather_data.get("notes"):
+                notes_section = page.wait_for_selector(".notes-section", timeout=5000)
+                assert notes_section.is_visible()
+            else:
+                # Ensure the notes section is not present
+                assert not page.is_visible(".notes-section")
 
             # Take a screenshot
             os.makedirs("screenshots", exist_ok=True)

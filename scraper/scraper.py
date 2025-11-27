@@ -310,7 +310,12 @@ class SkiWeatherScraper:
                         if word["top"] > max_y
                     ]
                     if words_below:
-                        data["notes"] = " ".join(words_below)
+                        notes_text = " ".join(words_below)
+                        footer_keywords = ["@", "#", "urlaubsregionaltenberg"]
+                        if any(keyword in notes_text for keyword in footer_keywords):
+                            data["notes"] = None
+                        else:
+                            data["notes"] = notes_text
 
                 logger.info(f"Extracted data: {data}")
                 return data
