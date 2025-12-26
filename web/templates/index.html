@@ -315,8 +315,8 @@
                 </div>
                 {% endif %}
             </div>
-            <div class="footer">
-                Aktualisiert um: {{ weather.update_time }}
+            <div id="last-updated" class="footer">
+                Aktualisiert am: {{ weather.last_updated }}
             </div>
             {% endif %}
         </div>
@@ -347,6 +347,30 @@
                 const isoDate = dateElement.textContent.trim();
                 if (isoDate) {
                     dateElement.textContent = formatDisplayDate(isoDate);
+                }
+            }
+
+            // Function to format the last updated timestamp
+            function formatLastUpdated(isoTimestamp) {
+                const date = new Date(isoTimestamp);
+                const options = {
+                    year: '2-digit',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                };
+                // German locale 'de-DE'
+                const formattedDate = new Intl.DateTimeFormat('de-DE', options).format(date);
+                return `Aktualisiert am: ${formattedDate.replace(',', ' um')} Uhr`;
+            }
+
+            const lastUpdatedElement = document.getElementById('last-updated');
+            if (lastUpdatedElement) {
+                const isoTimestamp = lastUpdatedElement.textContent.replace('Aktualisiert am:', '').trim();
+                if (isoTimestamp) {
+                    lastUpdatedElement.textContent = formatLastUpdated(isoTimestamp);
                 }
             }
         });

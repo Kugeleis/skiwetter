@@ -76,12 +76,29 @@ def test_extract_weather_data_success(scraper):
 
 
 def test_save_data(scraper):
-    data = {"test": "data"}
-    with patch("builtins.open", mock_open()):
+    """Test that data is saved correctly with a `last_updated` timestamp."""
+    data = {"test": "data", "last_updated": "old_timestamp"}  # The old timestamp should be overwritten.
+    m = mock_open()
+    with patch("builtins.open", m):
         with patch("json.dump") as mock_json_dump:
             with patch("os.makedirs"):
                 scraper.save_data(data)
-                mock_json_dump.assert_called_once()
+
+                # Get the data that was passed to json.dump
+                args, _ = mock_json_dump.call_args
+                saved_data = args[0]
+
+                # Assert that 'last_updated' is present and is a valid ISO 8601 timestamp
+                assert "last_updated" in saved_data
+                try:
+                    # Attempt to parse the timestamp to validate its format
+                    from datetime import datetime, timezone
+                    datetime.fromisoformat(saved_data["last_updated"])
+                except (ValueError, TypeError):
+                    pytest.fail("last_updated is not a valid ISO 8601 timestamp.")
+
+                # Assert that the original data is preserved
+                assert saved_data["test"] == "data"
 
 
 def test_fetch_pdf_url_handles_dynamic_link_text(scraper: SkiWeatherScraper):
