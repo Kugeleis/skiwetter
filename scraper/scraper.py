@@ -5,7 +5,7 @@ import os
 import re
 import shutil
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -288,6 +288,7 @@ class SkiWeatherScraper:
                     "last_snowfall": "Unknown",
                     "update_time": "Unknown",
                     "notes": None,
+                    "last_updated": "Unknown",
                 }
 
                 for table in tables:
@@ -330,6 +331,9 @@ class SkiWeatherScraper:
             data: The weather data dictionary.
         """
         try:
+            # Add the last_updated timestamp
+            data["last_updated"] = datetime.now(timezone.utc).isoformat()
+
             os.makedirs(os.path.dirname(self.data_file), exist_ok=True)
             with open(self.data_file, "w") as f:
                 json.dump(data, f, indent=2)
