@@ -2,10 +2,9 @@ import io
 import json
 import logging
 import os
-import re
 import shutil
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -305,11 +304,7 @@ class SkiWeatherScraper:
                     max_y = last_table_bbox[3]
 
                     # Extract words that are below the tables
-                    words_below = [
-                        word["text"]
-                        for word in page.extract_words()
-                        if word["top"] > max_y
-                    ]
+                    words_below = [word["text"] for word in page.extract_words() if word["top"] > max_y]
                     if words_below:
                         notes_text = " ".join(words_below)
                         footer_keywords = ["@", "#", "urlaubsregionaltenberg"]
@@ -332,7 +327,7 @@ class SkiWeatherScraper:
         """
         try:
             # Add the last_updated timestamp
-            data["last_updated"] = datetime.now(timezone.utc).isoformat()
+            data["last_updated"] = datetime.now(UTC).isoformat()
 
             os.makedirs(os.path.dirname(self.data_file), exist_ok=True)
             with open(self.data_file, "w") as f:

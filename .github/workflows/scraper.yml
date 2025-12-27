@@ -39,11 +39,20 @@ jobs:
       - name: Verify scraped data
         if: github.event_name == 'schedule' && steps.date.outputs.hour == '10'
         run: python scripts/verify_data.py
+        
+      - name: Install uv
+        run: pip install uv
 
-      - name: Copy weather data to docs
+      - name: Generate requirements.txt
+        run: uv pip compile pyproject.toml -o requirements.txt
+
+      - name: Install dependencies
+        run: uv pip install -r requirements.txt
+
+      - name: Generate static page
         run: |
-          mkdir -p docs
-          cp data/weather.json docs/weather.json
+          # The Taskfile is not available in the docker image, so we run the script directly
+          uv run python scripts/generate_static_page.py
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

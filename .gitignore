@@ -134,6 +134,7 @@ docker-compose.override.yml
 data/*
 !data/schedule.yaml
 weather.json
+/docs/index.html
 .DS_Store
 
 # Ruff

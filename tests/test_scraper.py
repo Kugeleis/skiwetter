@@ -1,4 +1,5 @@
 import io
+from datetime import datetime
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
@@ -91,8 +92,6 @@ def test_save_data(scraper):
                 # Assert that 'last_updated' is present and is a valid ISO 8601 timestamp
                 assert "last_updated" in saved_data
                 try:
-                    # Attempt to parse the timestamp to validate its format
-                    from datetime import datetime, timezone
                     datetime.fromisoformat(saved_data["last_updated"])
                 except (ValueError, TypeError):
                     pytest.fail("last_updated is not a valid ISO 8601 timestamp.")
@@ -105,7 +104,7 @@ def test_fetch_pdf_url_handles_dynamic_link_text(scraper: SkiWeatherScraper):
     """Test that the scraper correctly finds the PDF URL when the link text is dynamic."""
     with patch("requests.get") as mock_get:
         mock_response = MagicMock()
-        mock_response.content = '''
+        mock_response.content = """
         <html>
             <body>
                 <div class="abo-download-area">
@@ -118,7 +117,7 @@ def test_fetch_pdf_url_handles_dynamic_link_text(scraper: SkiWeatherScraper):
                 </div>
             </body>
         </html>
-        '''.encode()
+        """.encode()
         mock_get.return_value = mock_response
         url = scraper.fetch_pdf_url()
         assert url == "https://www.altenberg.de/r/622108495?page=media%2Fdownload"
@@ -128,7 +127,7 @@ def test_fetch_pdf_url_no_date_in_link(scraper: SkiWeatherScraper):
     """Test that the scraper does not pick up a link with no date."""
     with patch("requests.get") as mock_get:
         mock_response = MagicMock()
-        mock_response.content = '''
+        mock_response.content = """
         <html>
             <body>
                 <div class="abo-download-area">
@@ -138,7 +137,7 @@ def test_fetch_pdf_url_no_date_in_link(scraper: SkiWeatherScraper):
                 </div>
             </body>
         </html>
-        '''.encode()
+        """.encode()
         mock_get.return_value = mock_response
         url = scraper.fetch_pdf_url()
         assert url is None

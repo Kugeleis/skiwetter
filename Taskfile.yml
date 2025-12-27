@@ -35,3 +35,8 @@ tasks:
     desc: Run the web server locally
     cmds:
       - uv run duty dev
+
+  generate-static:
+    desc: Generate static page for GitHub Pages
+    cmds:
+      - uv run python scripts/generate_static_page.py
